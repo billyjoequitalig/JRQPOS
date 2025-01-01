@@ -18,6 +18,8 @@ public class frmMain extends javax.swing.JFrame {
 
     frmUserManagement Users = new frmUserManagement();
     frmSale Sale = new frmSale();
+    frmLogin Login = new frmLogin();
+    frmStockManagent Stocks = new frmStockManagent();
 
     /**
      * Creates new form frmMain
@@ -26,8 +28,7 @@ public class frmMain extends javax.swing.JFrame {
         initComponents();
         this.setExtendedState(MAXIMIZED_BOTH);
         jpMiddle.add(Sale);
-        //jpMiddle.add(frmusers, BorderLayout.CENTER);
-        //jpMiddle.add(frmusers);
+        Sale.txtProductID.requestFocusInWindow();
     }
 
     /**
@@ -43,11 +44,12 @@ public class frmMain extends javax.swing.JFrame {
         panelLeft = new javax.swing.JPanel();
         tbtnManageUsers = new javax.swing.JButton();
         btnSale = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        btnMangeStocks = new javax.swing.JButton();
+        btnSupplier = new javax.swing.JButton();
         panelUp = new javax.swing.JPanel();
         panelButtom = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jButton6 = new javax.swing.JButton();
+        btnLogout = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jpMiddle = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -78,7 +80,7 @@ public class frmMain extends javax.swing.JFrame {
                 tbtnManageUsersActionPerformed(evt);
             }
         });
-        panelLeft.add(tbtnManageUsers, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 120, 120, 120));
+        panelLeft.add(tbtnManageUsers, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 120, 120));
 
         btnSale.setText("Sale");
         btnSale.addActionListener(new java.awt.event.ActionListener() {
@@ -86,15 +88,23 @@ public class frmMain extends javax.swing.JFrame {
                 btnSaleActionPerformed(evt);
             }
         });
-        panelLeft.add(btnSale, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 120));
+        panelLeft.add(btnSale, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 120, 120));
 
-        jButton4.setText("Manage Stocks");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        btnMangeStocks.setText("Manage Stocks");
+        btnMangeStocks.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                btnMangeStocksActionPerformed(evt);
             }
         });
-        panelLeft.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 120, 120));
+        panelLeft.add(btnMangeStocks, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, 120, 120));
+
+        btnSupplier.setText("Manage Supplier");
+        btnSupplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSupplierActionPerformed(evt);
+            }
+        });
+        panelLeft.add(btnSupplier, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 370, 120, 120));
 
         getContentPane().add(panelLeft, java.awt.BorderLayout.LINE_START);
 
@@ -102,18 +112,23 @@ public class frmMain extends javax.swing.JFrame {
         panelUp.setLayout(panelUpLayout);
         panelUpLayout.setHorizontalGroup(
             panelUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 736, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         panelUpLayout.setVerticalGroup(
             panelUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         getContentPane().add(panelUp, java.awt.BorderLayout.PAGE_START);
 
-        jButton6.setText("Logout");
-        jButton6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnLogout.setText("Logout");
+        btnLogout.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnLogout.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogoutActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Report");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -129,18 +144,17 @@ public class frmMain extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                .addGap(35, 35, 35)
-                .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panelButtomLayout = new javax.swing.GroupLayout(panelButtom);
@@ -150,13 +164,13 @@ public class frmMain extends javax.swing.JFrame {
             .addGroup(panelButtomLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(598, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelButtomLayout.setVerticalGroup(
             panelButtomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelButtomLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(12, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -181,15 +195,21 @@ public class frmMain extends javax.swing.JFrame {
     private void btnSaleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaleActionPerformed
         // TODO add your handling code here:
         jpMiddle.remove(Users);
+        jpMiddle.remove(Stocks);
         jpMiddle.add(Sale);
+        Sale.txtProductID.requestFocusInWindow();
     }//GEN-LAST:event_btnSaleActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void btnMangeStocksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMangeStocksActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
+        jpMiddle.remove(Users);
+        jpMiddle.remove(Sale);
+        jpMiddle.add(Stocks);
+    }//GEN-LAST:event_btnMangeStocksActionPerformed
 
     private void tbtnManageUsersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbtnManageUsersActionPerformed
         // TODO add your handling code here:
+        jpMiddle.remove(Stocks);
         jpMiddle.remove(Sale);
         jpMiddle.add(Users);
 
@@ -199,6 +219,16 @@ public class frmMain extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
+        // TODO add your handling code here:
+        this.setVisible(false);
+        Login.setVisible(true);
+    }//GEN-LAST:event_btnLogoutActionPerformed
+
+    private void btnSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSupplierActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSupplierActionPerformed
 
     /**
      * @param args the command line arguments
@@ -231,10 +261,11 @@ public class frmMain extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnMangeStocks;
     private javax.swing.JButton btnSale;
+    private javax.swing.JButton btnSupplier;
     private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton6;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;

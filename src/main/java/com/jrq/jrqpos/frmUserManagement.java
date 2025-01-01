@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.print.attribute.standard.JobStateReason;
 import javax.swing.JOptionPane;
 //import org.apache.commons.dbutils.DbUtils;
 import net.proteanit.sql.DbUtils;
@@ -65,7 +64,7 @@ public class frmUserManagement extends javax.swing.JPanel {
         txtIDnumber.setText(String.valueOf(concatenatedString));
     }
 
-    public void ReadAll() {
+    private void ReadAll() {
         try {
             DBCon.Open();
             db.ReadAll();
@@ -222,12 +221,17 @@ public class frmUserManagement extends javax.swing.JPanel {
         tblUsers.setRowHeight(40);
         tblUsers.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tblUsers.setShowGrid(false);
+        tblUsers.getTableHeader().setResizingAllowed(false);
+        tblUsers.getTableHeader().setReorderingAllowed(false);
         tblUsers.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblUsersMouseClicked(evt);
             }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tblUsersMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                tblUsersMouseReleased(evt);
             }
         });
         jScrollPane2.setViewportView(tblUsers);
@@ -416,6 +420,7 @@ public class frmUserManagement extends javax.swing.JPanel {
             DBCon.Close();
             Clear();
             ReadAll();
+            newID();
             JOptionPane.showMessageDialog(null, "Updated");
         } catch (SQLException ex) {
             Logger.getLogger(frmUserManagement.class.getName()).log(Level.SEVERE, null, ex);
@@ -432,6 +437,7 @@ public class frmUserManagement extends javax.swing.JPanel {
             DBCon.Close();
             Clear();
             ReadAll();
+            newID();
             if (Status.equals("Activated")) {
                 JOptionPane.showMessageDialog(null, "Activated");
             } else {
@@ -463,6 +469,10 @@ public class frmUserManagement extends javax.swing.JPanel {
         Clear();
         newID();
     }//GEN-LAST:event_btnClearActionPerformed
+
+    private void tblUsersMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblUsersMouseReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tblUsersMouseReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

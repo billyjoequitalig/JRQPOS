@@ -16,7 +16,6 @@ import java.sql.Statement;
 public class UserManagement {
 
     public static ResultSet rs;
-
     DBConnection DBCon = new DBConnection("localhost", "3306", "jrqdb", "root", "001995234");
 
     //Create account
