@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -205,6 +206,7 @@ public class frmMain extends javax.swing.JFrame {
         jpMiddle.remove(Users);
         jpMiddle.remove(Sale);
         jpMiddle.add(Stocks);
+        Stocks.txtProductID.requestFocusInWindow();
     }//GEN-LAST:event_btnMangeStocksActionPerformed
 
     private void tbtnManageUsersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbtnManageUsersActionPerformed
@@ -228,6 +230,14 @@ public class frmMain extends javax.swing.JFrame {
 
     private void btnSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSupplierActionPerformed
         // TODO add your handling code here:
+        double input;
+        double total = 0;
+        for (int i = 0; i < 2; i++) {
+            input = Double.parseDouble(JOptionPane.showInputDialog(null, "Insert num"));
+            total += input;
+        }
+        JOptionPane.showMessageDialog(null, total);
+
     }//GEN-LAST:event_btnSupplierActionPerformed
 
     /**

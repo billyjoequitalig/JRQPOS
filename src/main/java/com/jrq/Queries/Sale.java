@@ -19,7 +19,7 @@ public class Sale {
     DBConnection DBCon = new DBConnection("localhost", "3306", "jrqdb", "root", "001995234");
 
     public boolean SelectProduct(String ProductID) throws SQLException {
-        String sql = "SELECT ProductID, ProductName, uom, SRP From Products where ProductID = '" + ProductID + "'";
+        String sql = "SELECT ProductID, ProductName, uom, Qty, SRP From Products where ProductID = '" + ProductID + "'";
         Statement st = DBCon.gettter().createStatement();
         rs = st.executeQuery(sql);
         return false;

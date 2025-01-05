@@ -6,9 +6,10 @@ package com.jrq.jrqpos;
 
 import com.jrq.Queries.Sale;
 import static com.jrq.Queries.Sale.rs;
+import java.awt.HeadlessException;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
-import net.proteanit.sql.DbUtils;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -23,7 +24,7 @@ public class frmSale extends javax.swing.JPanel {
      * Creates new form frmSale
      */
     public frmSale() {
-        initComponents(); 
+        initComponents();
     }
 
     /**
@@ -40,9 +41,7 @@ public class frmSale extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         txtProductID = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
         lblPrice = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         jpRight = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
@@ -52,7 +51,7 @@ public class frmSale extends javax.swing.JPanel {
         jpLeft = new javax.swing.JPanel();
         jpDown = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnNewTransac = new javax.swing.JButton();
         jpCenter = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblSale = new javax.swing.JTable();
@@ -80,7 +79,7 @@ public class frmSale extends javax.swing.JPanel {
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtProductID, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(202, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -95,52 +94,24 @@ public class frmSale extends javax.swing.JPanel {
         jpUP.add(jPanel1);
 
         lblPrice.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        lblPrice.setText("0.00");
-
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
-        jLabel4.setText("Total:");
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblPrice)
-                .addContainerGap())
-        );
-
-        jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel4, lblPrice});
-
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(lblPrice))
-                .addContainerGap())
-        );
-
-        jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jLabel4, lblPrice});
+        lblPrice.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lblPrice.setText("Total: 0.00");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(lblPrice)
+                .addContainerGap(260, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(lblPrice)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jpUP.add(jPanel2);
@@ -217,8 +188,13 @@ public class frmSale extends javax.swing.JPanel {
         jButton1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jButton1.setText("Pay");
 
-        jButton2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jButton2.setText("New");
+        btnNewTransac.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnNewTransac.setText("New");
+        btnNewTransac.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNewTransacActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jpDownLayout = new javax.swing.GroupLayout(jpDown);
         jpDown.setLayout(jpDownLayout);
@@ -228,7 +204,7 @@ public class frmSale extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnNewTransac, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jpDownLayout.setVerticalGroup(
@@ -237,7 +213,7 @@ public class frmSale extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jpDownLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnNewTransac, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -282,42 +258,81 @@ public class frmSale extends javax.swing.JPanel {
 
     private void txtProductIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtProductIDActionPerformed
         // TODO add your handling code here:
+        DefaultTableModel model = (DefaultTableModel) tblSale.getModel();
+        model.setColumnIdentifiers(new Object[]{"ProductID", "roduct Name", "UoM", "QTY", "SRP"}); // Set your column headers
+        boolean productExists = false;
+        String GetID = txtProductID.getText();
+        double totalPrice = 0.0;
         try {
             DBCon.Open();
-            db.SelectProduct(txtProductID.getText());
-            tblSale.setModel(DbUtils.resultSetToTableModel(rs));
+            db.SelectProduct(GetID);
+            if (rs.next()) {
+                String ProductName = rs.getString("ProductName");
+                String uom = rs.getString("uom");
+                String SRP = rs.getString("SRP");
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    if (model.getValueAt(i, 0).toString().equals(GetID)) {
+                        int CurrentQty = Integer.parseInt(model.getValueAt(i, 3).toString());
+                        model.setValueAt(CurrentQty + 1, i, 3);
+                        // Update price (optional, based on quantity logic)
+                        double unitPrice = Double.parseDouble(SRP);
+                        model.setValueAt(String.format("%.2f", unitPrice * (CurrentQty + 1)), i, 4);
+                        productExists = true;
+                        break;
+                    }
+                }
+                // If the product does not exist, add a new row
+                if (!productExists) {
+                    model.addRow(new Object[]{GetID, ProductName, uom, 1, SRP});
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Product not found in stock!");
+            }
             DBCon.Close();
+            for (int i = 0; i < model.getRowCount(); i++) {
+                totalPrice += Double.parseDouble(model.getValueAt(i, 4).toString());
+            }
+            lblPrice.setText("Total: " + String.format("%.2f", totalPrice));
             tblSale.setDefaultEditor(Object.class, null);
-        } catch (SQLException e) {
+
+        } catch (HeadlessException | NumberFormatException | SQLException e) {
             System.out.println(e);
         }
         txtProductID.setText("");
-
-        //int row = tblSale.getSelectedRow();
-        //lblPrice.setText(tblSale.getValueAt(row, 1).toString());
-        int row = tblSale.getRowCount() - 1;
-        if (row >= 0) {
-            // Retrieve the value at the desired column (1 in this case)
-            lblPrice.setText(tblSale.getValueAt(row, 3).toString());
-        } else {
-            // Handle the case where the table is empty
-            JOptionPane.showMessageDialog(null, "No Stock Found");
-        }
-
     }//GEN-LAST:event_txtProductIDActionPerformed
 
+    private void btnNewTransacActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewTransacActionPerformed
+        // TODO add your handling code here:
+        int response = JOptionPane.showConfirmDialog(
+                null,
+                "Do you want to proceed?",
+                "Confirm Action",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+        switch (response) {
+            case JOptionPane.YES_OPTION -> {
+                DefaultTableModel model = (DefaultTableModel) tblSale.getModel();
+                model.setRowCount(0); // Removes all rows from the model
+                lblPrice.setText("Total: 0.00");
+            }
+            case JOptionPane.NO_OPTION ->
+                System.out.println("You selected: No");
+            default ->
+                System.out.println("Dialog closed without a selection.");
+        }
+    }//GEN-LAST:event_btnNewTransacActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnNewTransac;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel jpCenter;
     private javax.swing.JPanel jpDown;
