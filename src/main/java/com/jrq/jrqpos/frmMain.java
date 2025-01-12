@@ -18,18 +18,19 @@ import javax.swing.JPanel;
 public class frmMain extends javax.swing.JFrame {
 
     frmUserManagement Users = new frmUserManagement();
-    frmSale Sale = new frmSale();
     frmLogin Login = new frmLogin();
     frmStockManagent Stocks = new frmStockManagent();
+    public static String UserID;
+    frmSale Sale;
 
-    /**
-     * Creates new form frmMain
-     */
-    public frmMain() {
+    public frmMain(String UserID) {
+        frmMain.UserID = UserID;
         initComponents();
         this.setExtendedState(MAXIMIZED_BOTH);
+        Sale = new frmSale(UserID);
         jpMiddle.add(Sale);
         Sale.txtProductID.requestFocusInWindow();
+
     }
 
     /**
@@ -165,7 +166,7 @@ public class frmMain extends javax.swing.JFrame {
             .addGroup(panelButtomLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(370, Short.MAX_VALUE))
         );
         panelButtomLayout.setVerticalGroup(
             panelButtomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -195,27 +196,30 @@ public class frmMain extends javax.swing.JFrame {
 
     private void btnSaleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaleActionPerformed
         // TODO add your handling code here:
-        jpMiddle.remove(Users);
-        jpMiddle.remove(Stocks);
+        jpMiddle.removeAll();
         jpMiddle.add(Sale);
+        jpMiddle.revalidate();
+        jpMiddle.repaint();
         Sale.txtProductID.requestFocusInWindow();
     }//GEN-LAST:event_btnSaleActionPerformed
 
     private void btnMangeStocksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMangeStocksActionPerformed
         // TODO add your handling code here:
-        jpMiddle.remove(Users);
-        jpMiddle.remove(Sale);
+        jpMiddle.removeAll();
         jpMiddle.add(Stocks);
+        jpMiddle.revalidate();
+        jpMiddle.repaint();
         Stocks.txtProductID.requestFocusInWindow();
+        Stocks.ReadAllProduct();
+
     }//GEN-LAST:event_btnMangeStocksActionPerformed
 
     private void tbtnManageUsersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbtnManageUsersActionPerformed
         // TODO add your handling code here:
-        jpMiddle.remove(Stocks);
-        jpMiddle.remove(Sale);
+        jpMiddle.removeAll();
         jpMiddle.add(Users);
-
-
+        jpMiddle.revalidate();
+        jpMiddle.repaint();
     }//GEN-LAST:event_tbtnManageUsersActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -224,19 +228,12 @@ public class frmMain extends javax.swing.JFrame {
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
         // TODO add your handling code here:
-        this.setVisible(false);
+        this.dispose();
         Login.setVisible(true);
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void btnSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSupplierActionPerformed
         // TODO add your handling code here:
-        double input;
-        double total = 0;
-        for (int i = 0; i < 2; i++) {
-            input = Double.parseDouble(JOptionPane.showInputDialog(null, "Insert num"));
-            total += input;
-        }
-        JOptionPane.showMessageDialog(null, total);
 
     }//GEN-LAST:event_btnSupplierActionPerformed
 
@@ -265,7 +262,7 @@ public class frmMain extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new frmMain().setVisible(true);
+                new frmMain(UserID).setVisible(true);
             }
         });
     }

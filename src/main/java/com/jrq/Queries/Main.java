@@ -6,23 +6,13 @@ package com.jrq.Queries;
 
 import com.jrq.jrqpos.DBConnection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  *
  * @author billy
  */
-public class Login {
+public class Main {
 
     public static ResultSet rs;
-
     DBConnection DBCon = new DBConnection("localhost", "3306", "jrqdb", "root", "001995234");
-
-    public boolean UserExist(String Username, String Password) throws SQLException {
-        String sql = "SELECT UserID FROM users Where UserName = '" + Username + "' and Password = '" + Password + "'";
-        Statement st = DBCon.gettter().createStatement();
-        rs = st.executeQuery(sql);
-        return false;
-    }
 }

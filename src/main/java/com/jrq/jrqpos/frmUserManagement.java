@@ -234,6 +234,11 @@ public class frmUserManagement extends javax.swing.JPanel {
                 tblUsersMouseReleased(evt);
             }
         });
+        tblUsers.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tblUsersKeyPressed(evt);
+            }
+        });
         jScrollPane2.setViewportView(tblUsers);
 
         cbAccessType.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
@@ -389,21 +394,7 @@ public class frmUserManagement extends javax.swing.JPanel {
 
     private void tblUsersMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblUsersMousePressed
         // TODO add your handling code here:
-        int row = tblUsers.getSelectedRow();
-        txtIDnumber.setText(tblUsers.getValueAt(row, 0).toString());
-        txtFname.setText(tblUsers.getValueAt(row, 1).toString());
-        txtLname.setText(tblUsers.getValueAt(row, 2).toString());
-        txtUsername.setText(tblUsers.getValueAt(row, 3).toString());
-        txtPassword.setText(tblUsers.getValueAt(row, 4).toString());
-        String AccessType = tblUsers.getValueAt(row, 5).toString();
-        cbAccessType.setSelectedItem(AccessType);
-        txtStatus.setText(tblUsers.getValueAt(row, 6).toString());
-        Activate();
-        btnActivate.setEnabled(true);
-        btnUpdate.setEnabled(true);
-        btnDelete.setEnabled(true);
-        btnClear.setEnabled(true);
-        btnAdd.setEnabled(false);
+        SelectFromUser();
 
     }//GEN-LAST:event_tblUsersMousePressed
 
@@ -474,6 +465,26 @@ public class frmUserManagement extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_tblUsersMouseReleased
 
+    private void tblUsersKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblUsersKeyPressed
+        // TODO add your handling code here:
+        int selectedRow = tblUsers.getSelectedRow();
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_UP) {
+            SelectFromUser();
+//            // Move selection up
+//            if (selectedRow > 0) {
+//                //tblProducts.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
+//                
+//            }
+        } else if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_DOWN) {
+            // Move selection down
+            SelectFromUser();
+//            if (selectedRow < tblUsers.getRowCount() - 1) {
+//                //tblProducts.setRowSelectionInterval(selectedRow + 1, selectedRow + 1);
+//            
+//            }
+        }
+    }//GEN-LAST:event_tblUsersKeyPressed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActivate;
@@ -499,4 +510,23 @@ public class frmUserManagement extends javax.swing.JPanel {
     private javax.swing.JTextField txtStatus;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
+
+    private void SelectFromUser() {
+        int row = tblUsers.getSelectedRow();
+        txtIDnumber.setText(tblUsers.getValueAt(row, 0).toString());
+        txtFname.setText(tblUsers.getValueAt(row, 1).toString());
+        txtLname.setText(tblUsers.getValueAt(row, 2).toString());
+        txtUsername.setText(tblUsers.getValueAt(row, 3).toString());
+        txtPassword.setText(tblUsers.getValueAt(row, 4).toString());
+        String AccessType = tblUsers.getValueAt(row, 5).toString();
+        cbAccessType.setSelectedItem(AccessType);
+        txtStatus.setText(tblUsers.getValueAt(row, 6).toString());
+        Activate();
+        btnActivate.setEnabled(true);
+        btnUpdate.setEnabled(true);
+        btnDelete.setEnabled(true);
+        btnClear.setEnabled(true);
+        btnAdd.setEnabled(false);
+        //throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

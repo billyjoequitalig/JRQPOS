@@ -25,4 +25,27 @@ public class Sale {
         return false;
     }
 
+    public boolean UpdateQty(String Qty, String ProductID) throws SQLException {
+        String sql = "UPDATE Products SET Qty = '" + Qty + "' WHERE ProductID = '" + ProductID + "'";
+        Statement st = DBCon.gettter().createStatement();
+        st.executeUpdate(sql);
+        return false;
+    }
+
+    // Addsale record
+    public boolean AddSale(String SaleID, String UserID, String TotalAmount, String Cash, String Change, String Date, String Time, String TQty) throws SQLException {
+        String sql = "INSERT INTO Sale (SaleID,UserID,TotalAmount,Cash,CashChange,TransDate,TransTime,TotalQty) Values ('" + SaleID + "','" + UserID + "','" + TotalAmount + "','" + Cash + "','" + Change + "','" + Date + "','" + Time + "','" + TQty + "')";
+        Statement st = DBCon.gettter().createStatement();
+        st.executeUpdate(sql);
+        return false;
+    }
+
+    // AddProduct Sold
+    public boolean AddProductSold(String SaleID, String ProductID, String PricepU, String QTY,String UoM, String SRP, String ProfitpU, String DateSold) throws SQLException {
+        String sql = "INSERT INTO Sale (SaleID,ProductID,PricepU,Qty,UoM,SRP,ProfitpU,DateSold) Values ('" + SaleID + "','" + ProductID + "','" + PricepU + "','" + QTY + "','" + UoM + "','" + SRP + "','" + ProfitpU + "','" + DateSold + "')";
+        Statement st = DBCon.gettter().createStatement();
+        st.executeUpdate(sql);
+        return false;
+    }
+
 }

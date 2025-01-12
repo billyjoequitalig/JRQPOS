@@ -6,6 +6,7 @@ package com.jrq.jrqpos;
 
 import com.jrq.Queries.StockManagement;
 import static com.jrq.Queries.StockManagement.rs;
+import java.awt.HeadlessException;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableColumnModel;
@@ -24,6 +25,7 @@ public class frmStockManagent extends javax.swing.JPanel {
     /**
      * Creates new form frmManageStocks
      */
+    //Column Sizes
     public final void JTableProduct() {
         tblProducts.setDefaultEditor(Object.class, null);
         TableColumnModel tcm = tblProducts.getColumnModel();
@@ -39,7 +41,49 @@ public class frmStockManagent extends javax.swing.JPanel {
         tblProducts.changeSelection(0, 0, false, false);
     }
 
-    private void ReadAllProduct() {
+    private void refreshTable() {
+
+    }
+
+    private void SearchID() {
+        if (txtSearch.getText().equals("")) {
+            clear();
+        } else {
+            try {
+                DBCon.Open();
+                db.SearchProductID(txtSearch.getText());
+                if (rs.next() && rs != null) {
+                    tblProducts.setModel(DbUtils.resultSetToTableModel(rs));
+                    DBCon.Close();
+                    JTableProduct();
+                    SelectFromtbl();
+                }
+                JOptionPane.showMessageDialog(null, "Product not Exist");
+
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+    }
+
+    private void Search() {
+        if (txtSearch.getText().equals("")) {
+            clear();
+        } else {
+            try {
+                DBCon.Open();
+                db.SearchProduct(txtSearch.getText());
+                tblProducts.setModel(DbUtils.resultSetToTableModel(rs));
+                DBCon.Close();
+                JTableProduct();
+                SelectFromtbl();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+    }
+
+    public void ReadAllProduct() {
         try {
             DBCon.Open();
             db.ReadProducts();
@@ -67,18 +111,57 @@ public class frmStockManagent extends javax.swing.JPanel {
         cbSupplier.setSelectedIndex(-1);
         cbUOM.setSelectedIndex(-1);
         lblProfit.setText("0");
-        btnAdd.setEnabled(true);
-        btnClear.setEnabled(false);
-        btnDelete.setEnabled(false);
-        btnUpdate.setEnabled(false);
-        txtProductID.requestFocusInWindow();
+        updateButtonStates(true, false, false, false);
+        //txtProductID.requestFocusInWindow();
 
+    }
+
+// Helper method to manage button states
+    private void updateButtonStates(boolean addEnabled, boolean clearEnabled, boolean deleteEnabled, boolean updateEnabled) {
+        btnAdd.setEnabled(addEnabled);
+        btnClear.setEnabled(clearEnabled);
+        btnDelete.setEnabled(deleteEnabled);
+        btnUpdate.setEnabled(updateEnabled);
     }
 
     private void SelectFromtbl() {
         int row = tblProducts.getSelectedRow();
-        if (row <= -1) {
-            return; // Exit the method early
+        if (row == -1) {
+            JOptionPane.showMessageDialog(null, "Please select a product from the table.");
+            return;
+        }
+        try {
+            // Ensure the table has data
+            if (tblProducts.getRowCount() == 0) {
+                clear();
+                return;
+            }
+            // Safely retrieve and set values
+            ProductID = tblProducts.getValueAt(row, 0).toString();
+            txtProductID.setText(ProductID);
+            txtProductName.setText(tblProducts.getValueAt(row, 1).toString());
+            cbUOM.setSelectedItem(tblProducts.getValueAt(row, 2).toString());
+            txtQTY.setText(tblProducts.getValueAt(row, 3).toString());
+
+            double up = Double.parseDouble(tblProducts.getValueAt(row, 4).toString());
+            txtUnitPrice.setText(String.valueOf(up));
+
+            double srp = Double.parseDouble(tblProducts.getValueAt(row, 5).toString());
+            txtSRP.setText(String.valueOf(srp));
+
+            txtMarkup.setText(tblProducts.getValueAt(row, 6).toString());
+            cbSupplier.setSelectedItem(tblProducts.getValueAt(row, 7).toString());
+
+            double Profit = srp - up;
+            lblProfit.setText(String.valueOf(String.format("%.2f", Profit)));
+
+            updateButtonStates(false, true, true, true);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(null, "An error occurred while selecting the product. Please ensure the table data is complete.");
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid number format in table data. Please check the input.");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "An unexpected error occurred: " + e.getMessage());
         }
         ProductID = tblProducts.getValueAt(row, 0).toString();
         txtProductID.setText(tblProducts.getValueAt(row, 0).toString());
@@ -92,12 +175,8 @@ public class frmStockManagent extends javax.swing.JPanel {
         txtMarkup.setText(tblProducts.getValueAt(row, 6).toString());
         cbSupplier.setSelectedItem(tblProducts.getValueAt(row, 7).toString());
         double Profit = srp - up;
-        lblProfit.setText(String.valueOf(Profit));
-        btnAdd.setEnabled(false);
-        btnClear.setEnabled(true);
-        btnDelete.setEnabled(true);
-        btnUpdate.setEnabled(true);
-
+        lblProfit.setText(String.valueOf(String.format("%.2f", Profit)));
+        updateButtonStates(false, true, true, true);
     }
 
     /**
@@ -145,14 +224,32 @@ public class frmStockManagent extends javax.swing.JPanel {
         jLabel12.setText("Search:");
 
         txtSearch.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtSearch.addCaretListener(new javax.swing.event.CaretListener() {
+            public void caretUpdate(javax.swing.event.CaretEvent evt) {
+                txtSearchCaretUpdate(evt);
+            }
+        });
+        txtSearch.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+                txtSearchCaretPositionChanged(evt);
+            }
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+            }
+        });
         txtSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtSearchActionPerformed(evt);
             }
         });
         txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchKeyPressed(evt);
+            }
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtSearchKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSearchKeyTyped(evt);
             }
         });
 
@@ -167,11 +264,17 @@ public class frmStockManagent extends javax.swing.JPanel {
         ));
         tblProducts.setRowHeight(40);
         tblProducts.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tblProducts.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tblProducts.getTableHeader().setResizingAllowed(false);
         tblProducts.getTableHeader().setReorderingAllowed(false);
         tblProducts.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tblProductsMousePressed(evt);
+            }
+        });
+        tblProducts.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tblProductsKeyPressed(evt);
             }
         });
         jScrollPane2.setViewportView(tblProducts);
@@ -237,6 +340,11 @@ public class frmStockManagent extends javax.swing.JPanel {
         jLabel9.setText("Markup %:");
 
         txtMarkup.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtMarkup.addCaretListener(new javax.swing.event.CaretListener() {
+            public void caretUpdate(javax.swing.event.CaretEvent evt) {
+                txtMarkupCaretUpdate(evt);
+            }
+        });
         txtMarkup.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtMarkupActionPerformed(evt);
@@ -282,6 +390,16 @@ public class frmStockManagent extends javax.swing.JPanel {
         cbSupplier.setSelectedIndex(-1);
 
         txtProductID.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtProductID.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtProductIDActionPerformed(evt);
+            }
+        });
+        txtProductID.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtProductIDKeyReleased(evt);
+            }
+        });
 
         cbUOM.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         cbUOM.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "pcs", "dz", "kg", "g", "L", "mL", "gal", "Meters", "Centimeters", "Inches", "Cartons", "Bags", "Rolls", "Boxes", "Pallets", "Bundles", "Crates", "Barrels " }));
@@ -414,7 +532,7 @@ public class frmStockManagent extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jpMiddleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtUnitPrice))
+                            .addComponent(txtUnitPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jpMiddleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtSRP, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
@@ -452,7 +570,7 @@ public class frmStockManagent extends javax.swing.JPanel {
 
     private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
         // TODO add your handling code here:
-
+        SearchID();
     }//GEN-LAST:event_txtSearchActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
@@ -476,7 +594,7 @@ public class frmStockManagent extends javax.swing.JPanel {
                 DBCon.Open();
                 db.AddProduct(txtProductID.getText(), txtProductName.getText(), cbUOM.getSelectedItem().toString(), txtQTY.getText(), txtUnitPrice.getText(), txtSRP.getText(), txtMarkup.getText(), cbSupplier.getSelectedItem().toString(), lblProfit.getText());
                 DBCon.Close();
-                ReadAllProduct();
+                Search();
                 clear();
                 JOptionPane.showMessageDialog(null, "Successful");
             } catch (SQLException e) {
@@ -501,7 +619,8 @@ public class frmStockManagent extends javax.swing.JPanel {
                     DBCon.Open(); // Open the database connection
                     db.DeleteProduct(txtProductID.getText()); // Delete the product
                     DBCon.Close(); // Close the database connection
-                    ReadAllProduct(); // Refresh the product list
+                    Search();
+                    //ReadAllProduct(); // Refresh the product list
                     clear(); // Clear input fields
                     JOptionPane.showMessageDialog(null, "Deleted successfully.");
                 }
@@ -542,6 +661,7 @@ public class frmStockManagent extends javax.swing.JPanel {
                     db.UpdateProduct(txtProductID.getText(), txtProductName.getText(), cbUOM.getSelectedItem().toString(), txtQTY.getText(), txtUnitPrice.getText(), txtSRP.getText(), txtMarkup.getText(), cbSupplier.getSelectedItem().toString(), ProductID, lblProfit.getText());
                     DBCon.Close();
                     ReadAllProduct();
+                    Search();
                     clear();
                     JOptionPane.showMessageDialog(null, "Updated");
                 }
@@ -552,12 +672,6 @@ public class frmStockManagent extends javax.swing.JPanel {
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "An error occurred: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            try {
-                DBCon.Close(); // Ensure the connection is closed in case of an error
-            } catch (SQLException closeException) {
-                System.err.println("Failed to close the database connection: " + closeException.getMessage());
-            }
         }
 
 //        try {
@@ -603,23 +717,15 @@ public class frmStockManagent extends javax.swing.JPanel {
             double Markup = ((SRP - UnitPrice) / UnitPrice) * 100;
             int MarkupInt = (int) Markup;
             double Profit = SRP - UnitPrice;
-            lblProfit.setText(String.valueOf(Profit));
+            lblProfit.setText(String.valueOf(String.format("%.2f", Profit)));
             txtMarkup.setText(String.valueOf(MarkupInt));
         }
     }//GEN-LAST:event_txtSRPCaretUpdate
 
     private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
         // TODO add your handling code here:
-        try {
-            DBCon.Open();
-            db.SearchProduct(txtSearch.getText(), txtSearch.getText());
-            tblProducts.setModel(DbUtils.resultSetToTableModel(rs));
-            DBCon.Close();
-            JTableProduct();
-            SelectFromtbl();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e);
-        }
+        ReadAllProduct();
+        Search();
 
     }//GEN-LAST:event_txtSearchKeyReleased
 
@@ -637,6 +743,82 @@ public class frmStockManagent extends javax.swing.JPanel {
         // TODO add your handling code here:
 
     }//GEN-LAST:event_txtSRPKeyTyped
+
+    private void txtProductIDKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtProductIDKeyReleased
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_txtProductIDKeyReleased
+
+    private void txtMarkupCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMarkupCaretUpdate
+        // TODO add your handling code here:
+//        double UnitPrice = Double.parseDouble(txtUnitPrice.getText());
+//        double Markup = Double.parseDouble(txtMarkup.getText());
+//        double SRP = UnitPrice + (UnitPrice * Markup / 100);
+//        // Format SRP to two decimal places
+//        txtSRP.setText(String.format("%.2f", SRP));
+    }//GEN-LAST:event_txtMarkupCaretUpdate
+
+    private void txtProductIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtProductIDActionPerformed
+        // TODO add your handling code here:
+        try {
+            DBCon.Open();
+            db.SearchProductID(txtProductID.getText());
+            if (rs.next() && rs != null) {
+                JOptionPane.showMessageDialog(null, "Product Exist");
+                txtProductName.setText(rs.getString(2));
+                cbUOM.setSelectedItem(rs.getString(3));
+                txtQTY.setText(rs.getString(4));
+                txtUnitPrice.setText(rs.getString(5));
+                txtSRP.setText(rs.getString(6));
+                txtMarkup.setText(rs.getString(7));
+                cbSupplier.setSelectedItem(rs.getString(8));
+                lblProfit.setText(rs.getString(9));
+                updateButtonStates(false, true, true, true);
+            }
+            DBCon.Close();
+        } catch (HeadlessException | SQLException e) {
+            System.out.println(e);
+        }
+    }//GEN-LAST:event_txtProductIDActionPerformed
+
+    private void tblProductsKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblProductsKeyPressed
+        //TODO add your handling code here:
+        int selectedRow = tblProducts.getSelectedRow(); // Get the currently selected row
+        // Check which key is pressed
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_UP) {
+            // Move selection up
+            if (selectedRow > 0) {
+                //tblProducts.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
+                SelectFromtbl();
+            }
+        } else if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_DOWN) {
+            // Move selection down
+            if (selectedRow < tblProducts.getRowCount() - 1) {
+                //tblProducts.setRowSelectionInterval(selectedRow + 1, selectedRow + 1);
+                SelectFromtbl();
+            }
+        }
+    }//GEN-LAST:event_tblProductsKeyPressed
+
+    private void txtSearchCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtSearchCaretUpdate
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_txtSearchCaretUpdate
+
+    private void txtSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchKeyPressed
+
+    private void txtSearchCaretPositionChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_txtSearchCaretPositionChanged
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_txtSearchCaretPositionChanged
+
+    private void txtSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyTyped
+        // TODO add your handling code here:
+
+
+    }//GEN-LAST:event_txtSearchKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

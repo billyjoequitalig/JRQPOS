@@ -6,6 +6,7 @@ package com.jrq.jrqpos;
 
 import com.jrq.Queries.Login;
 import static com.jrq.Queries.Login.rs;
+import java.awt.event.KeyEvent;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
@@ -17,14 +18,57 @@ public class frmLogin extends javax.swing.JFrame {
 
     Login db = new Login();
     DBConnection DBCon = new DBConnection("localhost", "3306", "jrqdb", "root", "001995234");
+    public String Name;
 
     /**
      * Creates new form Login
      */
     public frmLogin() {
         initComponents();
+        txtUsername.setToolTipText("Enter your username");
+        txtpass.setToolTipText("Enter your password");
     }
 
+    public String getterID() {
+        return Name;
+    }
+
+    public void setterID(String Name) {
+        this.Name = Name;
+        //System.out.println("Name set to: " + this.Name);
+    }
+
+    private void login() {
+        if (this.txtUsername.getText().length() == 0) {
+            JOptionPane.showMessageDialog(null, "Please Enter Username");
+        } else if (this.txtpass.getPassword().length == 0) {
+            JOptionPane.showMessageDialog(null, "Please Enter Password");
+        } else {
+            if ((txtUsername.getText().isEmpty())) {
+                JOptionPane.showMessageDialog(null, "Please Insert Username");
+            } else if (txtpass.getPassword().length == 0) {
+                JOptionPane.showMessageDialog(null, "Please Insert Password");
+            } else {
+                try {
+                    DBCon.Open();
+                    db.UserExist(txtUsername.getText(), new String(txtpass.getPassword()));
+                    if (rs != null && rs.next()) {
+                        String UserID = rs.getString(1);
+                        setterID(UserID);
+                        frmMain main = new frmMain(getterID());
+                        this.dispose();
+                        main.setVisible(true);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "User Not Exist");
+                    }
+                    DBCon.Close();
+                } catch (SQLException e) { // Logs the error to the console
+                    // Logs the error to the console
+                    JOptionPane.showMessageDialog(this, "An error occurred: " + e.getMessage());
+                }
+            }
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -54,6 +98,11 @@ public class frmLogin extends javax.swing.JFrame {
                 txtUsernameActionPerformed(evt);
             }
         });
+        txtUsername.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtUsernameKeyPressed(evt);
+            }
+        });
 
         btnOk.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnOk.setText("OK");
@@ -81,6 +130,11 @@ public class frmLogin extends javax.swing.JFrame {
         txtpass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtpassActionPerformed(evt);
+            }
+        });
+        txtpass.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtpassKeyPressed(evt);
             }
         });
 
@@ -149,30 +203,29 @@ public class frmLogin extends javax.swing.JFrame {
 
     private void txtpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtpassActionPerformed
         // TODO add your handling code here:
+
     }//GEN-LAST:event_txtpassActionPerformed
 
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
         // TODO add your handling code here:
-        if ((txtUsername.getText().isEmpty())) {
-            JOptionPane.showMessageDialog(null, "Please Insert Username");
-        } else if (txtpass.getPassword().length == 0) {
-            JOptionPane.showMessageDialog(null, "Please Insert Password");
-        } else {
-            try {
-                DBCon.Open();
-                db.UserExist(txtUsername.getText(), new String(txtpass.getPassword()));
-                if (rs != null && rs.next()) {
-                    frmMain main = new frmMain();
-                    main.setVisible(true);
-                    this.setVisible(false);
-                } else {
-                    JOptionPane.showMessageDialog(null, "User Not Exist");
-                }
-                DBCon.Close();
-            } catch (SQLException e) {
-            }
-        }
+        login();
     }//GEN-LAST:event_btnOkActionPerformed
+
+    private void txtpassKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtpassKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            // Enter was pressed. Your code goes here.
+            login();
+        }
+    }//GEN-LAST:event_txtpassKeyPressed
+
+    private void txtUsernameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsernameKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            // Enter was pressed. Your code goes here.
+            login();
+        }
+    }//GEN-LAST:event_txtUsernameKeyPressed
 
     /**
      * @param args the command line arguments

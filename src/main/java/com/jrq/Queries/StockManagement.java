@@ -51,8 +51,15 @@ public class StockManagement {
     }
 
     // Search Product
-    public boolean SearchProduct(String ProductName, String ProductID) throws SQLException {
-        String sql = "SELECT ProductID, ProductName,uom,Qty,UnitPrice,SRP,Markup,Supplier,UnitProfit FROM products WHERE ProductName LIKE '%" + ProductName + "%' OR ProductID = '" + ProductID + "' order by ProductName ASC";
+    public boolean SearchProduct(String ProductName) throws SQLException {
+        String sql = "SELECT ProductID, ProductName,uom,Qty,UnitPrice,SRP,Markup,Supplier,UnitProfit FROM products WHERE ProductName LIKE '%" + ProductName + "%'";
+        Statement st = DBCon.gettter().createStatement();
+        rs = st.executeQuery(sql);
+        return false;
+    }
+
+    public boolean SearchProductID(String ProductID) throws SQLException {
+        String sql = "SELECT ProductID, ProductName,uom,Qty,UnitPrice,SRP,Markup,Supplier,UnitProfit FROM products WHERE ProductID = '" + ProductID + "'";
         Statement st = DBCon.gettter().createStatement();
         rs = st.executeQuery(sql);
         return false;
