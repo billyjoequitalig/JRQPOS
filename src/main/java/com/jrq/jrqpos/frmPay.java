@@ -6,6 +6,7 @@ package com.jrq.jrqpos;
 
 import com.jrq.Queries.Login;
 import com.jrq.Queries.Pay;
+import com.jrq.Queries.Sale;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public final class frmPay extends javax.swing.JDialog {
     public static ResultSet rs;
     DBConnection DBCon = new DBConnection("localhost", "3306", "jrqdb", "root", "001995234");
     Pay db = new Pay();
+    Boolean PayCancel;
 
     /**
      * Creates new form frmPay
@@ -200,12 +202,16 @@ public final class frmPay extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        this.setVisible(false);
+        this.dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnPayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPayActionPerformed
         // TODO add your handling code here:
         Change();
+        Sale.SaleID();
+        Sale.AddSale();
+        Sale.AddProductSold();
+        Sale.UpdateStocks();
         //DefaultTableModel model = (DefaultTableModel) Sale.getJtable();
         //model.setRowCount(0);
         // System.out.println("Getter value in frmPay: " + login.getterName());
@@ -216,7 +222,7 @@ public final class frmPay extends javax.swing.JDialog {
 //        } catch (SQLException e) {
 //            System.out.println(e);
 //        }
-        //Sale.clear();
+        Sale.clear();
         //this.dispose();
     }//GEN-LAST:event_btnPayActionPerformed
 

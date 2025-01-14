@@ -18,6 +18,13 @@ public class Sale {
     public static ResultSet rs;
     DBConnection DBCon = new DBConnection("localhost", "3306", "jrqdb", "root", "001995234");
 
+    public boolean SelectAllFieldProduct(String ProductID) throws SQLException {
+        String sql = "SELECT * FROM Products where ProductID = '" + ProductID + "'";
+        Statement st = DBCon.gettter().createStatement();
+        rs = st.executeQuery(sql);
+        return false;
+    }
+
     public boolean SelectProduct(String ProductID) throws SQLException {
         String sql = "SELECT ProductID, ProductName, uom, Qty, SRP From Products where ProductID = '" + ProductID + "'";
         Statement st = DBCon.gettter().createStatement();
@@ -41,11 +48,10 @@ public class Sale {
     }
 
     // AddProduct Sold
-    public boolean AddProductSold(String SaleID, String ProductID, String PricepU, String QTY,String UoM, String SRP, String ProfitpU, String DateSold) throws SQLException {
-        String sql = "INSERT INTO Sale (SaleID,ProductID,PricepU,Qty,UoM,SRP,ProfitpU,DateSold) Values ('" + SaleID + "','" + ProductID + "','" + PricepU + "','" + QTY + "','" + UoM + "','" + SRP + "','" + ProfitpU + "','" + DateSold + "')";
+    public boolean AddProductSold(String SaleID, String ProductID, String PricepU, String QTY, String UoM, String SRP,String Total,String UnitProfit, String DateSold,String Time) throws SQLException {
+        String sql = "INSERT INTO SoldProduct (SaleID,ProductID,PricepUnit,Qty,UoM,SRP,Total,ProfitpU,DateSold,Time) Values ('" + SaleID + "','" + ProductID + "','" + PricepU + "','" + QTY + "','" + UoM + "','" + SRP + "','" + Total + "','" + UnitProfit + "','" + DateSold + "','" + Time + "')";
         Statement st = DBCon.gettter().createStatement();
         st.executeUpdate(sql);
         return false;
     }
-
 }

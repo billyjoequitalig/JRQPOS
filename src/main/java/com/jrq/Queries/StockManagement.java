@@ -43,7 +43,7 @@ public class StockManagement {
     }
 
     // Update Product
-    public boolean UpdateProduct(String NewProductID, String ProductName, String uom, String QTY, String UnitPrice, String SRP, String Markup, String Supplier, String OldProductID, String UnitProfit) throws SQLException {
+    public boolean UpdateProduct(String NewProductID, String ProductName, String uom, String QTY, String UnitPrice, String SRP, String Markup, String Supplier, String UnitProfit, String OldProductID) throws SQLException {
         String sql = "UPDATE Products SET ProductID = '" + NewProductID + "', ProductName = '" + ProductName + "' ,uom = '" + uom + "',Qty = '" + QTY + "',UnitPrice = '" + UnitPrice + "',SRP = '" + SRP + "',Markup = '" + Markup + "',Supplier = '" + Supplier + "',UnitProfit = '" + UnitProfit + "' WHERE ProductID = '" + OldProductID + "'";
         Statement st = DBCon.gettter().createStatement();
         st.executeUpdate(sql);
@@ -51,8 +51,8 @@ public class StockManagement {
     }
 
     // Search Product
-    public boolean SearchProduct(String ProductName) throws SQLException {
-        String sql = "SELECT ProductID, ProductName,uom,Qty,UnitPrice,SRP,Markup,Supplier,UnitProfit FROM products WHERE ProductName LIKE '%" + ProductName + "%'";
+    public boolean SearchProduct(String Search) throws SQLException {
+        String sql = "SELECT ProductID, ProductName,uom,Qty,UnitPrice,SRP,Markup,Supplier,UnitProfit FROM products WHERE ProductName LIKE '%" + Search + "%' OR ProductID LIKE '%" + Search + "%' ";
         Statement st = DBCon.gettter().createStatement();
         rs = st.executeQuery(sql);
         return false;

@@ -89,32 +89,38 @@ public class frmSale extends javax.swing.JPanel {
         model.addRow(new Object[]{productId, productName, uom, 1, String.format("%.2f", SRP), String.format("%.2f", SRP)});
     }
 
-    private void AddSale() {
+    public void AddSale() {
         String getCashAmount = pay.getInputValue();
         String getTotal = pay.getTotal();
         String getChange = String.valueOf(pay.GetChange());
         try {
             DBCon.Open();
-            db.AddSale(SaleID(), getUserID, getTotal, getCashAmount, getChange, Date(), Time(), lblTItem.getText());
+            db.AddSale(SaleID, getUserID, getTotal, getCashAmount, getChange, Date(), Time(), lblTItem.getText());
             DBCon.Close();
         } catch (SQLException e) {
-            System.out.println(e);
+            JOptionPane.showMessageDialog(null, e);
         }
     }
 
-    private void AddProductSold() {
+    public void AddProductSold() {
         try {
             DBCon.Open();
             DefaultTableModel model = (DefaultTableModel) tblSale.getModel();
+            JOptionPane.showMessageDialog(null, model.getRowCount());
             for (int i = 0; i < model.getRowCount(); i++) {
                 String productId = model.getValueAt(i, 0).toString();
-                double orderedQty = Double.parseDouble(model.getValueAt(i, 3).toString());
-                db.SelectProduct(productId);
-                double currentStock = 0;
+                String UoM = model.getValueAt(i, 2).toString();
+                String QTY = model.getValueAt(i, 3).toString();
+                String SRP = model.getValueAt(i, 4).toString();
+                String Total = model.getValueAt(i, 5).toString();
+                db.SelectAllFieldProduct(productId);
+                String UnitProfit = null;
+                String PricePerUnit = null;
                 if (rs.next()) {
-                    currentStock = rs.getDouble("QTY");
+                    PricePerUnit = rs.getString("UnitPrice");
+                    UnitProfit = rs.getString("UnitProfit");
                 }
-                db.AddProductSold(SaleID(), "ProductID", "PricepU", "QTY", "UoM", "SRP", "ProfitpU", "DateSold");
+                db.AddProductSold(SaleID, productId, PricePerUnit, QTY, UoM, SRP, Total, UnitProfit, Date(), Time());
             }
             DBCon.Close();
         } catch (SQLException e) {
@@ -463,22 +469,26 @@ public class frmSale extends javax.swing.JPanel {
                 String uom = rs.getString("uom");
                 double SRP = rs.getDouble("SRP");
                 double GetQty = rs.getDouble("QTY");
-                // Check if the product already exists in the table
-                for (int i = 0; i < model.getRowCount(); i++) {
-                    if (model.getValueAt(i, 0).toString().equals(GetID)) {
-                        double CurrentQty = Double.parseDouble(model.getValueAt(i, 3).toString());
-                        double newQty = CurrentQty + 1;
-                        if (!ValidateStock(GetQty - newQty, GetQty)) {
-                            return;
+                if (GetQty == 0) {
+                    JOptionPane.showMessageDialog(null, "This Product is out of Stock!", " Out of Stock", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    // Check if the product already exists in the table
+                    for (int i = 0; i < model.getRowCount(); i++) {
+                        if (model.getValueAt(i, 0).toString().equals(GetID)) {
+                            double CurrentQty = Double.parseDouble(model.getValueAt(i, 3).toString());
+                            double newQty = CurrentQty + 1;
+                            if (!ValidateStock(GetQty - newQty, GetQty)) {
+                                return;
+                            }
+                            updateRow(model, i, newQty, SRP);
+                            productExists = true;
+                            break;
                         }
-                        updateRow(model, i, newQty, SRP);
-                        productExists = true;
-                        break;
                     }
-                }
-                // If the product does not exist, add a new row
-                if (!productExists) {
-                    addNewRow(model, GetID, ProductName, uom, SRP);
+                    // If the product does not exist, add a new row
+                    if (!productExists) {
+                        addNewRow(model, GetID, ProductName, uom, SRP);
+                    }
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Product not found in stock!");
@@ -537,9 +547,6 @@ public class frmSale extends javax.swing.JPanel {
         total = Double.parseDouble(lblPrice.getText());
         pay = new frmPay(this, getUserID);
         pay.setVisible(true);
-        AddSale();
-        UpdateStocks();
-        clear();
     }//GEN-LAST:event_btnPayActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

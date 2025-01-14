@@ -52,14 +52,10 @@ public class frmStockManagent extends javax.swing.JPanel {
             try {
                 DBCon.Open();
                 db.SearchProductID(txtSearch.getText());
-                if (rs.next() && rs != null) {
-                    tblProducts.setModel(DbUtils.resultSetToTableModel(rs));
-                    DBCon.Close();
-                    JTableProduct();
-                    SelectFromtbl();
-                }
-                JOptionPane.showMessageDialog(null, "Product not Exist");
-
+                tblProducts.setModel(DbUtils.resultSetToTableModel(rs));
+                DBCon.Close();
+                JTableProduct();
+                SelectFromtbl();
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e);
             }
@@ -179,6 +175,21 @@ public class frmStockManagent extends javax.swing.JPanel {
         updateButtonStates(false, true, true, true);
     }
 
+    private void CalculateUnitProfit() {
+        if (txtSRP.getText().equals("")) {
+            txtMarkup.setText("0");
+        } else {
+            double UnitPrice = Double.parseDouble(txtUnitPrice.getText());
+            //int markup = Integer.parseInt(txtMarkup.getText());
+            double SRP = Double.parseDouble(txtSRP.getText());
+            double Markup = ((SRP - UnitPrice) / UnitPrice) * 100;
+            int MarkupInt = (int) Markup;
+            double Profit = SRP - UnitPrice;
+            lblProfit.setText(String.valueOf(String.format("%.2f", Profit)));
+            txtMarkup.setText(String.valueOf(MarkupInt));
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -234,6 +245,7 @@ public class frmStockManagent extends javax.swing.JPanel {
                 txtSearchCaretPositionChanged(evt);
             }
             public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+                txtSearchInputMethodTextChanged(evt);
             }
         });
         txtSearch.addActionListener(new java.awt.event.ActionListener() {
@@ -570,7 +582,7 @@ public class frmStockManagent extends javax.swing.JPanel {
 
     private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
         // TODO add your handling code here:
-        SearchID();
+        //SearchID();
     }//GEN-LAST:event_txtSearchActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
@@ -592,6 +604,7 @@ public class frmStockManagent extends javax.swing.JPanel {
         } else {
             try {
                 DBCon.Open();
+                CalculateUnitProfit();
                 db.AddProduct(txtProductID.getText(), txtProductName.getText(), cbUOM.getSelectedItem().toString(), txtQTY.getText(), txtUnitPrice.getText(), txtSRP.getText(), txtMarkup.getText(), cbSupplier.getSelectedItem().toString(), lblProfit.getText());
                 DBCon.Close();
                 Search();
@@ -658,7 +671,8 @@ public class frmStockManagent extends javax.swing.JPanel {
             switch (response) {
                 case JOptionPane.YES_OPTION -> {
                     DBCon.Open();
-                    db.UpdateProduct(txtProductID.getText(), txtProductName.getText(), cbUOM.getSelectedItem().toString(), txtQTY.getText(), txtUnitPrice.getText(), txtSRP.getText(), txtMarkup.getText(), cbSupplier.getSelectedItem().toString(), ProductID, lblProfit.getText());
+                    CalculateUnitProfit();
+                    db.UpdateProduct(txtProductID.getText(), txtProductName.getText(), cbUOM.getSelectedItem().toString(), txtQTY.getText(), txtUnitPrice.getText(), txtSRP.getText(), txtMarkup.getText(), cbSupplier.getSelectedItem().toString(), lblProfit.getText(), ProductID);
                     DBCon.Close();
                     ReadAllProduct();
                     Search();
@@ -708,25 +722,13 @@ public class frmStockManagent extends javax.swing.JPanel {
 
     private void txtSRPCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtSRPCaretUpdate
         // TODO add your handling code here:
-        if (txtSRP.getText().equals("")) {
-            txtMarkup.setText("0");
-        } else {
-            double UnitPrice = Double.parseDouble(txtUnitPrice.getText());
-            //int markup = Integer.parseInt(txtMarkup.getText());
-            double SRP = Double.parseDouble(txtSRP.getText());
-            double Markup = ((SRP - UnitPrice) / UnitPrice) * 100;
-            int MarkupInt = (int) Markup;
-            double Profit = SRP - UnitPrice;
-            lblProfit.setText(String.valueOf(String.format("%.2f", Profit)));
-            txtMarkup.setText(String.valueOf(MarkupInt));
-        }
+        CalculateUnitProfit();
     }//GEN-LAST:event_txtSRPCaretUpdate
 
     private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
         // TODO add your handling code here:
         ReadAllProduct();
         Search();
-
     }//GEN-LAST:event_txtSearchKeyReleased
 
     private void txtSRPInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_txtSRPInputMethodTextChanged
@@ -812,6 +814,7 @@ public class frmStockManagent extends javax.swing.JPanel {
     private void txtSearchCaretPositionChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_txtSearchCaretPositionChanged
         // TODO add your handling code here:
 
+
     }//GEN-LAST:event_txtSearchCaretPositionChanged
 
     private void txtSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyTyped
@@ -819,6 +822,10 @@ public class frmStockManagent extends javax.swing.JPanel {
 
 
     }//GEN-LAST:event_txtSearchKeyTyped
+
+    private void txtSearchInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_txtSearchInputMethodTextChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchInputMethodTextChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
