@@ -4,17 +4,13 @@
  */
 package com.jrq.jrqpos;
 
-import com.jrq.Queries.Login;
-import com.jrq.Queries.Pay;
-import com.jrq.Queries.Sale;
+import java.awt.HeadlessException;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import javax.swing.JDialog;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -23,9 +19,6 @@ import javax.swing.table.DefaultTableModel;
 public final class frmPay extends javax.swing.JDialog {
 
     public static ResultSet rs;
-    DBConnection DBCon = new DBConnection("localhost", "3306", "jrqdb", "root", "001995234");
-    Pay db = new Pay();
-    Boolean PayCancel;
 
     /**
      * Creates new form frmPay
@@ -34,13 +27,11 @@ public final class frmPay extends javax.swing.JDialog {
     //frmLogin login = new frmLogin();
     //private final frmLogin login;
     public String GetID;
-    String SaleID;
-    String Time;
-    String Date;
     private String CashAmountValue;
     double Change;
     double Cash;
     double Total;
+    String MPayment;
 
     /**
      *
@@ -53,9 +44,12 @@ public final class frmPay extends javax.swing.JDialog {
         //System.out.println("frmPay received login instance: " + login);
         //System.out.println("Getter value in frmPay: " + login.getterName());
         initComponents();
+        SetterPayment("Cash");
         setLocationRelativeTo(null); // Center the popup on the screen
         setUndecorated(true);
         lblTotal.setText(String.valueOf((double) sale.GetTotal()));
+        togglePaymentOptions(btnEWallet, btnCash, lblref, txtReference, lblEWallet, cbEwallet, true, false, false, false, false, false);
+        this.pack();
     }
 
     public String getTotal() {
@@ -71,21 +65,86 @@ public final class frmPay extends javax.swing.JDialog {
         return String.valueOf(Change);
     }
 
-    public void Change() {
-        CashAmountValue = txtCashAmount.getText();
-        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        Total = Double.parseDouble(lblTotal.getText());
-        Cash = Double.parseDouble(txtCashAmount.getText());
-        if (Cash < Total) {
-            JOptionPane.showMessageDialog(this, "Insufficient cash amount!", "Error", JOptionPane.ERROR_MESSAGE);
+    private void togglePaymentOptions(JButton btnEWallet, JButton btnCash, JLabel lblref, JTextField txtref, JLabel lblEWallet, JComboBox cbEwallet, boolean enableEWallet, boolean enableCash, boolean showRef, boolean showTxtRef, boolean lblWallet, boolean cbEWallet) {
+        txtCashAmount.requestFocusInWindow();
+        btnEWallet.setEnabled(enableEWallet);
+        btnCash.setEnabled(enableCash);
+        lblref.setVisible(showRef);
+        txtref.setVisible(showTxtRef);
+        lblEWallet.setVisible(lblWallet);
+        cbEwallet.setVisible(cbEWallet);
+    }
+
+    private void SetterPayment(String MPayment) {
+        this.MPayment = MPayment;
+
+    }
+
+    private String ChoosePayment() {
+        return MPayment;
+    }
+
+    private void processSale(String reference, String eWallet) {
+        Sale.SaleID();
+        Sale.AddSale(reference, eWallet);
+        Sale.AddProductSold();
+        Sale.UpdateStocks();
+        Sale.clear();
+    }
+
+    private boolean isAmountSufficient() {
+        try {
+            CashAmountValue = txtCashAmount.getText();
+            Total = Double.parseDouble(lblTotal.getText());
+            Cash = Double.parseDouble(txtCashAmount.getText());
+            if (Cash < Total) {
+                return false;
+            } else {
+                this.dispose();
+                Change = Cash - Total;
+                String message = "<html><div style='text-align:center; font-family:Arial; font-size:65px; color:Green;'>" + Change + "</div></html>";
+                JOptionPane.showMessageDialog(null, message, "Change", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (HeadlessException | NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+
+    private void handleEWalletPayment() {
+        if (txtCashAmount.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please Enter Amount");
+            return;
+        }
+
+        if (txtReference.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please Enter Reference #");
+            return;
+        }
+
+        if (cbEwallet.getSelectedIndex() == -1) {
+            JOptionPane.showMessageDialog(null, "Please Select E-Wallet");
+            return;
+        }
+
+        if (isAmountSufficient()) {
+            processSale(txtReference.getText(), cbEwallet.getSelectedItem().toString());
         } else {
-            Change = Cash - Total;
-            String message = "<html><div style='text-align:center; font-family:Arial; font-size:65px; color:Green;'>" + Change + "</div></html>";
-            JOptionPane.showMessageDialog(null, message, "Change", JOptionPane.INFORMATION_MESSAGE);
-            this.dispose();
+            JOptionPane.showMessageDialog(null, "Invalid Amount Entered", "Please Enter Enough Amount", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    private void handleCashPayment() {
+        if (txtCashAmount.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please Enter Cash Amount");
+            return;
+        }
+        if (isAmountSufficient()) {
+            processSale("", "");
+        } else {
+            JOptionPane.showMessageDialog(null, "Invalid Amount Entered", "Please Enter Enough Amount", JOptionPane.ERROR_MESSAGE);
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -96,20 +155,34 @@ public final class frmPay extends javax.swing.JDialog {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        lblAmount = new javax.swing.JLabel();
         txtCashAmount = new javax.swing.JTextField();
         btnCancel = new javax.swing.JButton();
         btnPay = new javax.swing.JButton();
         lblTotal = new javax.swing.JLabel();
         lblTotal1 = new javax.swing.JLabel();
+        lblref = new javax.swing.JLabel();
+        txtReference = new javax.swing.JTextField();
+        lblEWallet = new javax.swing.JLabel();
+        cbEwallet = new javax.swing.JComboBox<>();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        btnCash = new javax.swing.JButton();
+        btnEWallet = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Payment");
         setMinimumSize(new java.awt.Dimension(400, 300));
         setModal(true);
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel2.setText("Cash Amount :");
+        jPanel1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jPanel1.setName(""); // NOI18N
+
+        lblAmount.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblAmount.setText("Cash Amount:");
+        lblAmount.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
 
         txtCashAmount.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         txtCashAmount.addActionListener(new java.awt.event.ActionListener() {
@@ -155,50 +228,181 @@ public final class frmPay extends javax.swing.JDialog {
         lblTotal1.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         lblTotal1.setText("Total:");
 
+        lblref.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblref.setText("Reference #:");
+        lblref.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+
+        txtReference.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtReference.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtReferenceActionPerformed(evt);
+            }
+        });
+        txtReference.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtReferenceKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtReferenceKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtReferenceKeyTyped(evt);
+            }
+        });
+
+        lblEWallet.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblEWallet.setText("E-Wallets:");
+        lblEWallet.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+
+        cbEwallet.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        cbEwallet.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Gcash", "Maya" }));
+        cbEwallet.setSelectedIndex(-1);
+        cbEwallet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbEwalletActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(lblTotal1)
+                        .addComponent(btnPay, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblTotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addGap(6, 6, 6)
-                            .addComponent(btnPay, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(44, 44, 44)
-                            .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addGap(6, 6, 6)
-                            .addComponent(jLabel2)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtCashAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(10, 10, 10))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblTotal1, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblref, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblEWallet, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtCashAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtReference, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cbEwallet, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(13, 13, 13))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblTotal)
-                    .addComponent(lblTotal1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtCashAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnPay, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(7, 7, 7)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblTotal1, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblref, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblEWallet, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtCashAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtReference, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbEwallet, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnPay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 529, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_START);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 529, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        getContentPane().add(jPanel3, java.awt.BorderLayout.PAGE_END);
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 347, Short.MAX_VALUE)
+        );
+
+        getContentPane().add(jPanel4, java.awt.BorderLayout.LINE_END);
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Mode of Payment"));
+
+        btnCash.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnCash.setText("CASH");
+        btnCash.setEnabled(false);
+        btnCash.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCashActionPerformed(evt);
+            }
+        });
+
+        btnEWallet.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnEWallet.setText("E-Wallet");
+        btnEWallet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEWalletActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnCash)
+                    .addComponent(btnEWallet))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel5Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnCash, btnEWallet});
+
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addComponent(btnCash)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnEWallet)
+                .addGap(0, 254, Short.MAX_VALUE))
+        );
+
+        jPanel5Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnCash, btnEWallet});
+
+        getContentPane().add(jPanel5, java.awt.BorderLayout.LINE_START);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
@@ -207,23 +411,11 @@ public final class frmPay extends javax.swing.JDialog {
 
     private void btnPayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPayActionPerformed
         // TODO add your handling code here:
-        Change();
-        Sale.SaleID();
-        Sale.AddSale();
-        Sale.AddProductSold();
-        Sale.UpdateStocks();
-        //DefaultTableModel model = (DefaultTableModel) Sale.getJtable();
-        //model.setRowCount(0);
-        // System.out.println("Getter value in frmPay: " + login.getterName());
-//        try {
-//            DBCon.Open();
-//            db.AddSale(SaleID, GetID, lblTotal.getText(), txtCashAmount.getText(), String.valueOf(Change), this.Date(), this.Time(), TItem);
-//            DBCon.Close();
-//        } catch (SQLException e) {
-//            System.out.println(e);
-//        }
-        Sale.clear();
-        //this.dispose();
+        if (ChoosePayment().equals("Cash")) {
+            handleCashPayment();
+        } else if (ChoosePayment().equals("EWallet")) {
+            handleEWalletPayment();
+        }
     }//GEN-LAST:event_btnPayActionPerformed
 
     private void txtCashAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCashAmountActionPerformed
@@ -242,14 +434,60 @@ public final class frmPay extends javax.swing.JDialog {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtCashAmountKeyTyped
 
+    private void txtReferenceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtReferenceActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtReferenceActionPerformed
+
+    private void txtReferenceKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtReferenceKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtReferenceKeyPressed
+
+    private void txtReferenceKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtReferenceKeyReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtReferenceKeyReleased
+
+    private void txtReferenceKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtReferenceKeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtReferenceKeyTyped
+
+    private void btnEWalletActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEWalletActionPerformed
+        // TODO add your handling code here:
+        SetterPayment("EWallet");
+        togglePaymentOptions(btnEWallet, btnCash, lblref, txtReference, lblEWallet, cbEwallet, false, true, true, true, true, true);
+        lblAmount.setText("Amount:");
+        txtCashAmount.requestFocusInWindow();
+    }//GEN-LAST:event_btnEWalletActionPerformed
+
+    private void btnCashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCashActionPerformed
+        // TODO add your handling code here:
+        SetterPayment("Cash");
+        togglePaymentOptions(btnEWallet, btnCash, lblref, txtReference, lblEWallet, cbEwallet, true, false, false, false, false, false);
+        lblAmount.setText("Cash Amount:");
+        txtCashAmount.requestFocusInWindow();
+    }//GEN-LAST:event_btnCashActionPerformed
+
+    private void cbEwalletActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbEwalletActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbEwalletActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnCash;
+    private javax.swing.JButton btnEWallet;
     private javax.swing.JButton btnPay;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JComboBox<String> cbEwallet;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JLabel lblAmount;
+    private javax.swing.JLabel lblEWallet;
     private javax.swing.JLabel lblTotal;
     private javax.swing.JLabel lblTotal1;
+    private javax.swing.JLabel lblref;
     private javax.swing.JTextField txtCashAmount;
+    private javax.swing.JTextField txtReference;
     // End of variables declaration//GEN-END:variables
 }

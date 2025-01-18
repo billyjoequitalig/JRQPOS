@@ -40,8 +40,8 @@ public class Sale {
     }
 
     // Addsale record
-    public boolean AddSale(String SaleID, String UserID, String TotalAmount, String Cash, String Change, String Date, String Time, String TQty) throws SQLException {
-        String sql = "INSERT INTO Sale (SaleID,UserID,TotalAmount,Cash,CashChange,TransDate,TransTime,TotalQty) Values ('" + SaleID + "','" + UserID + "','" + TotalAmount + "','" + Cash + "','" + Change + "','" + Date + "','" + Time + "','" + TQty + "')";
+    public boolean AddSale(String SaleID, String UserID, String TotalAmount, String Cash, String Change, String Date, String Time, String TQty,String ModePayment,String Ref) throws SQLException {
+        String sql = "INSERT INTO Sale (SaleID,UserID,TotalAmount,Cash,CashChange,TransDate,TransTime,TotalQty,ModePayment,Reference) Values ('" + SaleID + "','" + UserID + "','" + TotalAmount + "','" + Cash + "','" + Change + "','" + Date + "','" + Time + "','" + TQty + "','" + ModePayment + "','" + Ref + "')";
         Statement st = DBCon.gettter().createStatement();
         st.executeUpdate(sql);
         return false;

@@ -4,13 +4,6 @@
  */
 package com.jrq.jrqpos;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
 /**
  *
  * @author billy
@@ -20,6 +13,7 @@ public class frmMain extends javax.swing.JFrame {
     frmUserManagement Users = new frmUserManagement();
     frmLogin Login = new frmLogin();
     frmStockManagent Stocks = new frmStockManagent();
+    jdCategory jdc = new jdCategory();
     public static String UserID;
     frmSale Sale;
 
@@ -210,7 +204,7 @@ public class frmMain extends javax.swing.JFrame {
         jpMiddle.revalidate();
         jpMiddle.repaint();
         Stocks.txtProductID.requestFocusInWindow();
-        Stocks.ReadAllProduct();
+        Stocks.Search();
 
     }//GEN-LAST:event_btnMangeStocksActionPerformed
 

@@ -4,6 +4,7 @@
  */
 package com.jrq.Queries;
 
+import static com.jrq.Queries.Category.rs;
 import com.jrq.jrqpos.DBConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,4 +65,6 @@ public class StockManagement {
         rs = st.executeQuery(sql);
         return false;
     }
+
+   
 }
