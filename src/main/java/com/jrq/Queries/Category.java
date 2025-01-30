@@ -4,8 +4,6 @@
  */
 package com.jrq.Queries;
 
-import static com.jrq.Queries.Sale.rs;
-import static com.jrq.Queries.StockManagement.rs;
 import com.jrq.jrqpos.DBConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,92 +18,58 @@ public class Category {
     public static ResultSet rs;
     DBConnection DBCon = new DBConnection("localhost", "3306", "jrqdb", "root", "001995234");
 
-    public boolean AddCategory(String catID, String CatName) throws SQLException {
-        String sql = "INSERT INTO category (CategoryID,CategoryName) Values ('" + catID + "','" + CatName + "')";
+    //Adding Category
+    public boolean AddCategory(String table, String ColumnID, String ColName, String IDvalue, String ValueName) throws SQLException {
+        String sql = "INSERT INTO " + table + " (" + ColumnID + "," + ColName + ") Values ('" + IDvalue + "','" + ValueName + "')";
         Statement st = DBCon.gettter().createStatement();
         st.executeUpdate(sql);
         return false;
     }
 
-    public boolean AddSubCategory(String catID, String CatName) throws SQLException {
-        String sql = "INSERT INTO Subcategory (SubCategoryID,SubCategoryName) Values ('" + catID + "','" + CatName + "')";
+    // Adding for SubCategory and Variant
+    public boolean AddSubVar(String table, String ColumnID, String ColName, String ColFkCatID, String ValueID, String ValueName, String ValueFK) throws SQLException {
+        String sql = "INSERT INTO " + table + " (" + ColumnID + "," + ColName + "," + ColFkCatID + ") Values ('" + ValueID + "','" + ValueName + "','" + ValueFK + "')";
         Statement st = DBCon.gettter().createStatement();
         st.executeUpdate(sql);
         return false;
     }
 
-    public boolean AddVariant(String VarID, String VarName) throws SQLException {
-        String sql = "INSERT INTO Variant (VariantID,VariantName) Values ('" + VarID + "','" + VarName + "')";
-        Statement st = DBCon.gettter().createStatement();
-        st.executeUpdate(sql);
-        return false;
-    }
-
-    public boolean SelectCategory() throws SQLException {
-        String sql = "SELECT * From category";
+    //Getting CategoryID
+    public boolean SelectCategory(String table, String Name) throws SQLException {
+        String sql = "SELECT * From " + table + " ORDER BY " + Name + " ASC";
         Statement st = DBCon.gettter().createStatement();
         rs = st.executeQuery(sql);
         return false;
     }
 
-    public boolean SelectSubCategory() throws SQLException {
-        String sql = "SELECT * From Subcategory";
+    public boolean SelectSubVar(String table, String WhereColID, String ValueWhereID, String ColumnName) throws SQLException {
+        String sql = "SELECT * From " + table + " WHERE " + WhereColID + " = '" + ValueWhereID + "' ORDER BY " + ColumnName + " ASC";
         Statement st = DBCon.gettter().createStatement();
         rs = st.executeQuery(sql);
         return false;
     }
 
-    public boolean SelectVariant() throws SQLException {
-        String sql = "SELECT * From Variant";
+    //Getting Id of seleted item
+    public boolean SelectIDs(String table, String where, String WhereValue) throws SQLException {
+        String sql = "SELECT * FROM " + table + " WHERE " + where + " = '" + WhereValue + "'";
         Statement st = DBCon.gettter().createStatement();
         rs = st.executeQuery(sql);
         return false;
     }
 
     //Delete Category
-    public boolean DeleteCategory(String CatID) throws SQLException {
-        String sql = "Delete From category where CategoryID = '" + CatID + "'";
-        Statement st = DBCon.gettter().createStatement();
-        st.executeUpdate(sql);
-        return false;
-    }
-
-    //Delete SubCategory
-    public boolean DeleteSubCategory(String SubCatID) throws SQLException {
-        String sql = "Delete From Subcategory where SubCategoryID = '" + SubCatID + "'";
-        Statement st = DBCon.gettter().createStatement();
-        st.executeUpdate(sql);
-        return false;
-    }
-    //Delete SubCategory
-
-    public boolean DeleteVarient(String VarID) throws SQLException {
-        String sql = "Delete From Variant where VariantID = '" + VarID + "'";
+    public boolean DeleteCategory(String Table, String ColumnID, String CatID) throws SQLException {
+        String sql = "Delete From " + Table + " where " + ColumnID + " = '" + CatID + "'";
         Statement st = DBCon.gettter().createStatement();
         st.executeUpdate(sql);
         return false;
     }
 
     // Update category
-    public boolean UpdateCategory(String SubCategName, String SubCategID) throws SQLException {
-        String sql = "UPDATE category SET CategoryName = '" + SubCategName + "' WHERE CategoryID = '" + SubCategID + "'";
+    public boolean UpdateCategory(String table, String ColumnName, String CloumnID, String ValueName, String ValueCategID) throws SQLException {
+        String sql = "UPDATE " + table + " SET " + ColumnName + " = '" + ValueName + "' WHERE " + CloumnID + " = '" + ValueCategID + "'";
         Statement st = DBCon.gettter().createStatement();
         st.executeUpdate(sql);
         return false;
     }
-    // Update Subcategory
-    public boolean UpdateSubCategory(String SubCategName, String SubCategID) throws SQLException {
-        String sql = "UPDATE Subcategory SET SubCategoryName = '" + SubCategName + "' WHERE SubCategoryID = '" + SubCategID + "'";
-        Statement st = DBCon.gettter().createStatement();
-        st.executeUpdate(sql);
-        return false;
-    }
-    
-    public boolean UpdateVariant(String VarName, String VarID) throws SQLException {
-        String sql = "UPDATE Variant SET VariantName = '" + VarName + "' WHERE VariantID = '" + VarID + "'";
-        Statement st = DBCon.gettter().createStatement();
-        st.executeUpdate(sql);
-        return false;
-    }
-
 }

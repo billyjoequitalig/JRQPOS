@@ -34,20 +34,56 @@ public class frmSale extends javax.swing.JPanel {
     public frmSale(String UserID) {
         getUserID = frmMain.UserID = UserID;
         initComponents();
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"), "showInputDialog");
-        getActionMap().put("showInputDialog", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Action triggered by F9
-                inputQTY = Integer.valueOf(JOptionPane.showInputDialog("Enter Quantity:"));
-//                if (inputQTY != null) {
-//                    System.out.println("User entered: " + String.valueOf(inputQTY));
-//                }
-            }
-        });
+        togglebuttons(false, false, false);
     }
+
+    private void InputQTYf9() {
+        if (tblSale.getRowCount() != 0) {
+            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"), "showInputDialog");
+            getActionMap().put("showInputDialog", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // Action triggered by F9
+                    inputQTY = Integer.valueOf(JOptionPane.showInputDialog("Enter Quantity:"));
+                }
+            });
+        }
+    }
+
+    private void Newf5() {
+        if (tblSale.getRowCount() != 0) {
+            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"), "NewTransaction");
+            getActionMap().put("NewTransaction", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // Action triggered by F1
+                    newtransaction();
+                }
+            });
+        }
+    }
+
+    private void payf1() {
+        if (tblSale.getRowCount() != 0) {
+            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F1"), "showPayDialog");
+            getActionMap().put("showPayDialog", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // Action triggered by F1
+                    paydialog();
+                }
+            });
+        }
+    }
+
     public Integer getInputQTY() {
         return inputQTY;
+    }
+
+    private void togglebuttons(boolean Pay, boolean New, boolean Void) {
+        btnPay.setEnabled(Pay);
+        btnNewTransac.setEnabled(New);
+        btnVoid.setEnabled(Void);
     }
 
     public String SaleID() {
@@ -72,9 +108,7 @@ public class frmSale extends javax.swing.JPanel {
         lblPrice.setText("0.00");
         DefaultTableModel model = (DefaultTableModel) tblSale.getModel();
         model.setRowCount(0); // Removes all rows from the model
-        btnPay.setEnabled(false);
-        btnNewTransac.setEnabled(false);
-        btnVoid.setEnabled(false);
+        togglebuttons(false, false, false);
         lblTItem.setText("0");
     }
 
@@ -92,7 +126,7 @@ public class frmSale extends javax.swing.JPanel {
 
     public boolean ValidateStock(double AvailableQty, double GetQty) {
         if (AvailableQty < 0) {
-            JOptionPane.showMessageDialog(null, "Insufficient stock! You only have " + GetQty,"Out of Stock",JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Insufficient stock! You only have " + GetQty, "Out of Stock", JOptionPane.WARNING_MESSAGE);
             return false;
         }
         return true;
@@ -184,6 +218,32 @@ public class frmSale extends javax.swing.JPanel {
         }
     }
 
+    private void paydialog() {
+        total = Double.parseDouble(lblPrice.getText());
+        pay = new frmPay(this, getUserID);
+        pay.setVisible(true);
+    }
+
+    private void newtransaction() {
+        int response = JOptionPane.showConfirmDialog(
+                null,
+                "MAKE NEW TRANSACTION?",
+                "NEW TRANSACTION",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+        switch (response) {
+            case JOptionPane.YES_OPTION -> {
+                clear();
+                txtProductID.requestFocusInWindow();
+            }
+            case JOptionPane.NO_OPTION ->
+                System.out.println("You selected: No");
+            default ->
+                System.out.println("Dialog closed without a selection.");
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -212,6 +272,7 @@ public class frmSale extends javax.swing.JPanel {
         btnPay = new javax.swing.JButton();
         btnNewTransac = new javax.swing.JButton();
         btnVoid = new javax.swing.JButton();
+        btnVoid1 = new javax.swing.JButton();
         jpCenter = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblSale = new javax.swing.JTable();
@@ -242,7 +303,7 @@ public class frmSale extends javax.swing.JPanel {
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtProductID, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(259, Short.MAX_VALUE))
+                .addContainerGap(271, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -363,8 +424,7 @@ public class frmSale extends javax.swing.JPanel {
         add(jpLeft, java.awt.BorderLayout.LINE_START);
 
         btnPay.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnPay.setText("Pay");
-        btnPay.setEnabled(false);
+        btnPay.setText("Pay(F1)");
         btnPay.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPayActionPerformed(evt);
@@ -372,8 +432,7 @@ public class frmSale extends javax.swing.JPanel {
         });
 
         btnNewTransac.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnNewTransac.setText("New");
-        btnNewTransac.setEnabled(false);
+        btnNewTransac.setText("New(F5)");
         btnNewTransac.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNewTransacActionPerformed(evt);
@@ -381,11 +440,18 @@ public class frmSale extends javax.swing.JPanel {
         });
 
         btnVoid.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnVoid.setText("Void");
-        btnVoid.setEnabled(false);
+        btnVoid.setText("Void(F12)");
         btnVoid.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnVoidActionPerformed(evt);
+            }
+        });
+
+        btnVoid1.setFont(new java.awt.Font("Segoe UI", 0, 17)); // NOI18N
+        btnVoid1.setText("Price Check");
+        btnVoid1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVoid1ActionPerformed(evt);
             }
         });
 
@@ -400,7 +466,9 @@ public class frmSale extends javax.swing.JPanel {
                 .addComponent(btnNewTransac, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnVoid, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(744, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnVoid1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(642, Short.MAX_VALUE))
         );
         jpDownLayout.setVerticalGroup(
             jpDownLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -409,7 +477,8 @@ public class frmSale extends javax.swing.JPanel {
                 .addGroup(jpDownLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnPay, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnVoid, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnNewTransac, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnNewTransac, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnVoid1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
 
@@ -443,7 +512,7 @@ public class frmSale extends javax.swing.JPanel {
         jpCenterLayout.setHorizontalGroup(
             jpCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpCenterLayout.createSequentialGroup()
-                .addContainerGap(900, Short.MAX_VALUE)
+                .addContainerGap(924, Short.MAX_VALUE)
                 .addComponent(lbl1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblTItem)
@@ -451,13 +520,13 @@ public class frmSale extends javax.swing.JPanel {
             .addGroup(jpCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jpCenterLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 996, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1020, Short.MAX_VALUE)
                     .addContainerGap()))
         );
         jpCenterLayout.setVerticalGroup(
             jpCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpCenterLayout.createSequentialGroup()
-                .addContainerGap(301, Short.MAX_VALUE)
+                .addContainerGap(300, Short.MAX_VALUE)
                 .addGroup(jpCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblTItem)
                     .addComponent(lbl1))
@@ -465,7 +534,7 @@ public class frmSale extends javax.swing.JPanel {
             .addGroup(jpCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jpCenterLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
                     .addGap(33, 33, 33)))
         );
 
@@ -512,7 +581,7 @@ public class frmSale extends javax.swing.JPanel {
                     }
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "Product not found in stock!","Not Found",JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Product not found in stock!", "Not Found", JOptionPane.WARNING_MESSAGE);
             }
             DBCon.Close();
             // Calculate the overall total price
@@ -529,35 +598,20 @@ public class frmSale extends javax.swing.JPanel {
             lblTItem.setText(String.valueOf(totalQty));
             // Disable table editing
             tblSale.setDefaultEditor(Object.class, null);
+            txtProductID.setText("");
+            togglebuttons(true, true, true);
+            inputQTY = 1;
+            payf1();
+            InputQTYf9();
+            Newf5();
         } catch (HeadlessException | NumberFormatException | SQLException e) {
             System.out.println(e.getMessage());
-        } finally {
-            // Clear the input field
-            txtProductID.setText("");
-            btnPay.setEnabled(true);
-            btnNewTransac.setEnabled(true);
-            inputQTY = 1;
         }
     }//GEN-LAST:event_txtProductIDActionPerformed
 
     private void btnNewTransacActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewTransacActionPerformed
         // TODO add your handling code here:
-        int response = JOptionPane.showConfirmDialog(
-                null,
-                "Do you want to proceed?",
-                "Confirm Action",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
-        switch (response) {
-            case JOptionPane.YES_OPTION -> {
-                clear();
-            }
-            case JOptionPane.NO_OPTION ->
-                System.out.println("You selected: No");
-            default ->
-                System.out.println("Dialog closed without a selection.");
-        }
+        newtransaction();
     }//GEN-LAST:event_btnNewTransacActionPerformed
 
     private void btnVoidActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoidActionPerformed
@@ -566,15 +620,18 @@ public class frmSale extends javax.swing.JPanel {
 
     private void btnPayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPayActionPerformed
         // TODO add your handling code here:
-        total = Double.parseDouble(lblPrice.getText());
-        pay = new frmPay(this, getUserID);
-        pay.setVisible(true);
+        paydialog();
     }//GEN-LAST:event_btnPayActionPerformed
+
+    private void btnVoid1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoid1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnVoid1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnNewTransac;
     private javax.swing.JButton btnPay;
     private javax.swing.JButton btnVoid;
+    private javax.swing.JButton btnVoid1;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel2;

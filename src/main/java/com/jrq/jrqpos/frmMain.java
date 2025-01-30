@@ -13,7 +13,7 @@ public class frmMain extends javax.swing.JFrame {
     frmUserManagement Users = new frmUserManagement();
     frmLogin Login = new frmLogin();
     frmStockManagent Stocks = new frmStockManagent();
-    jdCategory jdc = new jdCategory();
+    jdCategory jdc = new jdCategory(Stocks);
     public static String UserID;
     frmSale Sale;
 
@@ -199,12 +199,15 @@ public class frmMain extends javax.swing.JFrame {
 
     private void btnMangeStocksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMangeStocksActionPerformed
         // TODO add your handling code here:
+        jdCategory jdc = new jdCategory(Stocks);
+        jdc.loadCategories("Category", "CategoryName", Stocks.cbCategGetter());
         jpMiddle.removeAll();
         jpMiddle.add(Stocks);
         jpMiddle.revalidate();
         jpMiddle.repaint();
         Stocks.txtProductID.requestFocusInWindow();
-        Stocks.Search();
+        //Stocks.Search();
+
 
     }//GEN-LAST:event_btnMangeStocksActionPerformed
 
